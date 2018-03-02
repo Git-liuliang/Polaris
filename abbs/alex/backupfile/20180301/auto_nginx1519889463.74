@@ -1,0 +1,133 @@
+#!/bin/bash
+#install nginx/1.10.3
+
+#Installation path
+INSTALL_DIR=/usr/local/
+SRC_DIR=/opt/package
+
+[ ! -d ${INSTALL_DIR} ] && mkdir -p ${INSTALL_DIR}
+[ ! -d ${SRC_DIR} ] && mkdir -p ${SRC_DIR}
+
+# Check if user is root
+if [ $(id -u) != "0" ]; then
+    echo "Error: You must be root to run this script!!"
+    exit 1
+fi
+
+#Install dependency package
+for Package in wget gcc gcc-c++ autoconf automake make build-essential zlib zlib-devel openssl openssl-devel pcre pcre-devel
+do
+    yum -y install $Package
+done
+
+function  Install_Nginx()
+{
+#update version
+NGINX="nginx-1.10.3"
+PCRE="pcre-8.40"
+ZLIB="zlib-1.2.11"
+OPENSSL="openssl-1.1.0e"
+PURGE="ngx_cache_purge-2.3"
+
+
+NGINXFEATURES="--prefix=${INSTALL_DIR}nginx \
+--user=nginx \
+--group=nginx \
+--with-http_ssl_module \
+--with-http_gzip_static_module \
+--with-http_stub_status_module \
+--with-http_realip_module \
+--with-stream \
+--with-stream_ssl_module \
+--pid-path=/var/run/nginx.pid \
+--with-pcre=${SRC_DIR}/${PCRE} \
+--with-zlib=${SRC_DIR}/${ZLIB} \
+--with-openssl=${SRC_DIR}/${OPENSSL} \
+--add-module=${SRC_DIR}/${PURGE} \
+--add-module=/home/fastdfs/fastdfs-nginx-module/src 
+"
+
+cd ${SRC_DIR}
+#download package
+echo 'Downloading NGINX'
+if [ ! -f ${NGINX}.tar.gz ]
+then
+  wget -c http://nginx.org/download/${NGINX}.tar.gz
+else
+  echo 'Skipping: NGINX already downloaded'
+fi
+
+echo 'Downloading PCRE'
+if [ ! -f ${PCRE}.tar.gz ]
+then
+  wget -c https://ftp.pcre.org/pub/pcre/${PCRE}.tar.gz     
+else
+  echo 'Skipping: PCRE already downloaded'
+fi
+
+echo 'Downloading ZLIB'
+if [ ! -f ${ZLIB}.tar.gz ]
+then
+  wget -c http://zlib.net/${ZLIB}.tar.gz
+else
+  echo 'Skipping: ZLIB already downloaded'
+fi
+
+echo 'Downloading OPENSSL'
+if [ ! -f ${OPENSSL}.tar.gz ]
+then
+  wget -c http://www.openssl.org/source/${OPENSSL}.tar.gz
+else
+  echo 'Skipping: OPENSSL already downloaded'
+fi
+
+echo 'Downloading PURGE'
+
+if [ ! -f 2.3.tar.gz ]
+then
+   wget -c 'https://github.com//FRiCKLE/ngx_cache_purge/archive/2.3.tar.gz'
+else
+   echo 'Skipping: PURGE already downloaded'
+fi
+
+echo '----------Unpacking downloaded archives. This process may take serveral minutes---------'
+
+echo "Extracting ${NGINX}..."
+tar xzf ${NGINX}.tar.gz
+echo 'Done.'
+
+echo "Extracting ${PCRE}..."
+tar xzf ${PCRE}.tar.gz
+echo 'Done.'
+
+echo "Extracting ${ZLIB}..."
+tar xzf ${ZLIB}.tar.gz
+echo 'Done.'
+
+echo "Extracting ${OPENSSL}..."
+tar xzf ${OPENSSL}.tar.gz
+echo 'Done.'
+
+echo "Extracting ${PURGE}..."
+tar xzf 2.3.tar.gz
+echo 'Done.'
+
+#add new user
+groupadd -r nginx
+useradd -r -g nginx nginx
+
+#make
+echo '###################'
+echo 'Compile NGINX'
+echo '###################'
+cd ${SRC_DIR}/${NGINX}
+./configure ${NGINXFEATURES}
+make
+make install
+echo '###################'
+echo 'ok'
+echo '###################'
+}
+
+Install_Nginx
+

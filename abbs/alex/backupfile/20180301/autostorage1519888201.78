@@ -1,0 +1,65 @@
+#!/bin/sh
+
+
+yum install gcc make unzip automake net-tools -y 
+mkdir -p /home/fastdfs 
+mkdir -p /home/fastdfs_file/data 
+mkdir /opt/fastdfs_storage_info 
+mkdir /opt/fastdfs_storage_data 
+ln -s /home/fastdfs_file/data /home/fastdfs_file/data/M00 
+
+cd /home/fastdfs/libfastcommon-1.0.7 
+./make.sh 
+./make.sh install 
+ln -s /usr/lib64/libfastcommon.so /usr/local/lib/libfastcommon.so 
+ln -s /usr/lib64/libfastcommon.so /usr/lib/libfastcommon.so 
+ln -s /usr/lib64/libfdfsclient.so /usr/local/lib/libfdfsclient.so 
+ln -s /usr/lib64/libfdfsclient.so /usr/lib/libfdfsclient.so 
+
+cd  /home/fastdfs/FastDFS 
+./make.sh 
+./make.sh install 
+cd /home/fastdfs/ 
+sed -i '/CORE_INCS/ s/local\///g' fastdfs-nginx-module/src/config 
+
+cd /usr/local/nginx/conf 
+sed -i '/404\.html/ a location ~/group1/M00 {root /opt/fastdfs_storage_data/data;ngx_fastdfs_module;}' nginx.conf 
+cd /etc/ld.so.conf.d/ 
+touch libfastcommon.conf 
+echo "/usr/lib64/" >> libfastcommon.conf 
+/sbin/ldconfig -v 
+cp /home/fastdfs/FastDFS/conf/http.conf /etc/fdfs/ 
+cp /home/fastdfs/FastDFS/conf/mime.types /etc/fdfs/ 
+cp /home/fastdfs/FastDFS/conf/storage.conf /etc/fdfs/storage.conf 
+cp /home/fastdfs/fastdfs-nginx-module/src/mod_fastdfs.conf /etc/fdfs/ 
+cd /etc/fdfs/ 
+sed -i '/^group_name/ s/group1/group1/' storage.conf 
+sed -i '/^base_path/ s/home\/yuqing\/fastdfs/opt\/fastdfs_storage_info/' storage.conf 
+sed -i '/^store_path0/ s/home\/yuqing\/fastdfs/opt\/fastdfs_storage_data/' storage.conf 
+sed -i '/^tracker_server/ s/192.168.209.121/127.0.0.1/' storage.conf 
+sed -i '/^base_path/ s/tmp/opt\/fastdfs_storage_info/' mod_fastdfs.conf 
+sed -i '/^tracker_server/ s/tracker:/127.0.0.1:/' mod_fastdfs.conf 
+sed -i '/^group_name/ s/group1/group1/' mod_fastdfs.conf 
+sed -i '/^url_have_group_name/ s/false/true/' mod_fastdfs.conf 
+sed -i '/^store_path0/ s/home\/yuqing\/fastdfs/opt\/fastdfs_storage_data/' mod_fastdfs.conf 
+sed -i '/^group_count/ s/0/3/' mod_fastdfs.conf 
+sed -i '$a\[group1]' mod_fastdfs.conf  
+sed -i '$a\group_name=group1' mod_fastdfs.conf 
+sed -i '$a\storage_server_port=23000' mod_fastdfs.conf 
+sed -i '$a\store_path_count=2' mod_fastdfs.conf 
+sed -i '$a\store_path0=/opt/fastdfs_storage_data' mod_fastdfs.conf 
+sed -i '$a\store_path1=/opt/fastdfs_storage_data' mod_fastdfs.conf 
+sed -i '$a\[group2]' mod_fastdfs.conf 
+sed -i '$a\group_name=group2' mod_fastdfs.conf 
+sed -i '$a\storage_server_port=23000' mod_fastdfs.conf 
+sed -i '$a\store_path_count=2' mod_fastdfs.conf 
+sed -i '$a\store_path0=/opt/fastdfs_storage_data' mod_fastdfs.conf 
+sed -i '$a\store_path1=/opt/fastdfs_storage_data' mod_fastdfs.conf 
+sed -i '$a\[group3]' mod_fastdfs.conf 
+sed -i '$a\group_name=group3' mod_fastdfs.conf 
+sed -i '$a\storage_server_port=23000' mod_fastdfs.conf 
+sed -i '$a\store_path_count=2' mod_fastdfs.conf 
+sed -i '$a\store_path0=/opt/fastdfs_storage_data' mod_fastdfs.conf 
+sed -i '$a\store_path1=/opt/fastdfs_storage_data' mod_fastdfs.conf 
+
+

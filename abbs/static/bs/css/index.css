@@ -1,0 +1,55 @@
+
+body{
+    font-size: 12px!important;
+
+}
+
+a{
+    text-decoration: none;
+}
+.navbar{
+    border-radius: 0!important;
+}
+
+.article_item img{
+    width: 86px;
+    height: 70px;
+    float: left;
+}
+
+.article_item .text{
+    margin-left:100px;
+    text-align: justify;
+
+}
+
+.icon{
+    margin-top: 10px;
+    margin-bottom: 8px;
+
+}
+
+.article_item{
+    border-bottom: 1px solid #dce7f4;
+}
+
+.glyphicon-comment{
+    vertical-align: -2px !important;
+}
+
+
+.article_item{
+    font-size: 12px;
+}
+
+
+
+.site_title{
+    text-align: center;
+}
+
+
+
+
+
+

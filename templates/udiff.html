@@ -1,0 +1,210 @@
+
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Dashboard Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="/static/bs/css/bootstrap.css">
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    {#    <link href="/static/css/assets/ie10-viewport-bug-workaround.css" rel="stylesheet">#}
+
+    <!-- Custom styles for this template -->
+    <link href="/static/css/assets/dashboard.css" rel="stylesheet">
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Project name</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">设置</a></li>
+                <li><a href="#">欢迎:{{ request.user.username }}</a></li>
+                <li><a href="#">退出</a></li>
+            </ul>
+            <form class="navbar-form navbar-right">
+                <input type="text" class="form-control" placeholder="Search...">
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
+                <li><a href="#">Reports</a></li>
+                <li><a href="#">Analytics</a></li>
+                <li><a href="#">Export</a></li>
+            </ul>
+            <ul class="nav nav-sidebar">
+                <li><a href="/udiff/">Nav item</a></li>
+                <li><a href="">Nav item again</a></li>
+                <li><a href="">One more nav</a></li>
+                <li><a href="">Another nav item</a></li>
+                <li><a href="">More navigation</a></li>
+            </ul>
+            <ul class="nav nav-sidebar">
+                <li><a href="">Nav item again</a></li>
+                <li><a href="">One more nav</a></li>
+                <li><a href="">Another nav item</a></li>
+            </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <h1 class="page-header">update</h1>
+
+            <label for="config">上传文件</label>
+            <input type="file" id="config">
+            <label >选择主机</label>
+            {% for x in res %}
+            <div class="radio">
+                <label>
+                    <input type="checkbox" name="check" id={{ x.nid }} value={{ x.ip_addr }}>
+                    {{ x.ip_addr }}
+                </label>
+            </div>
+           {% endfor %}
+           <label >文件目录</label>
+           <input type="text" class="form-control" id="filepath">
+           <input type="button" id="reg_btn" class="btn btn-success" value="提交">
+            <span id="error"></span>
+
+            <h2 class="sub-header">.</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Header</th>
+                        <th>Header</th>
+                        <th>Header</th>
+                        <th>Header</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for i in  task_list %}
+                        <tr>
+                            <td>{{ i.task_id }}</td>
+                            <td>{{ i.create_time }} </td>
+                            <td>{{ i.task_args }}</td>
+{#                            {% if not i.task_result %}#}
+                            <td class="btn-danger detail" id="{{ i.task_id }}"  >查看详情</td>
+{#                            {% else %}#}
+{#                             <td class="btn-success detail" id="{{ i.task_id }}" >已完成</td>#}
+{#                            {% endif %}#}
+                            <td>{{ request.user.username }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+<script src="/static/js/assets/holder.min.js"></script>
+<script>
+
+
+
+    // ajax 获取实时状态
+
+    $(".detail").click(function (){
+
+            console.log($(this).attr("id"));
+
+
+              $.ajax({
+                  url: "/process/",
+                  type: "post",
+                  data: {"jobid": $(this).attr("id")},
+                  success: function (data) {
+                      var data = JSON.parse(data);
+                       console.log(data.status);
+{#                      document.getElementById("{{ i.task_id }}").innerHTML = data.status;#}
+                  }
+              })
+
+
+});
+
+
+
+
+
+
+    // ajax请求验证
+
+    $("#reg_btn").click(function () {
+
+        // 基于ajax 进行文件上传时，需要利用form_data=new FormData();
+        var form_data = new FormData();
+        var checkID = [];
+        $("input[name='check']:checked").each(function (i) {//把所有被选中的复选框的值存入数组
+            checkID[i] = $(this).val();
+        });
+        form_data.append("ip_list", checkID);
+        form_data.append("filepath",$("#filepath").val());
+        form_data.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']").val());
+        form_data.append("avatar_img", $("#config")[0].files[0]);
+        console.log($("#config")[0].files[0]);
+
+        $.ajax({
+            url: "/udiff/",
+            type: "post",
+            processData: false,
+            contentType: false,
+            data: form_data,
+            success: function (data) {
+                var adata=JSON.parse(data);
+                if (adata.status == 1) {
+
+                    $("#error").html(adata.error_message);
+                }
+                else {
+
+                    console.log("aaaaaaaaaaaaaaaaaa");
+
+                     window.location.reload();
+                }
+            }
+        })
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/bs/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/reg.css">
+    <script src="/static/js/jquery-3.1.1.js"></script>
+</head>
+<body>
+<h3>注册页面</h3>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <form>
+                <div class="form-group">
+                    <label for="id_user">用户名</label>
+                    {{ form_obj.user }}  <span class="pull-right"></span>
+
+                </div>
+                <div class="form-group">
+                    <label for="id_pwd">密码</label>
+                    {{ form_obj.pwd }} <span class="pull-right"></span>
+                </div>
+                <div class="form-group">
+                    <label for="id_repeat_pwd">确认密码</label>
+                    {{ form_obj.repeat_pwd }} <span class="pull-right"></span>
+                </div>
+                <div class="form-group">
+                    <label for="id_email">邮箱</label>
+                    {{ form_obj.email }} <span class="pull-right"></span>
+                </div>
+
+                <div class="form-group">
+
+                        <label for="avatar">头像&nbsp;&nbsp;&nbsp;<img id="avatar_img" width="60" height="60" src="http://127.0.0.1:8000/static/img/default.png" alt=""></label>
+                        <input type="file" id="avatar">
+                </div>
+                {% csrf_token %}
+                <input type="button" class="btn btn-primary" value="submit" id="reg_btn">
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    // ajax请求验证
+
+    $("#reg_btn").click(function () {
+
+        // 基于ajax 进行文件上传时，需要利用form_data=new FormData();
+        var form_data=new FormData();
+        form_data.append("user",$("#id_user").val());
+        form_data.append("pwd",$("#id_pwd").val());
+        form_data.append("repeat_pwd",$("#id_repeat_pwd").val());
+        form_data.append("email",$("#id_email").val());
+        form_data.append("csrfmiddlewaretoken",$("[name='csrfmiddlewaretoken']").val());
+        form_data.append("avatar_img",$("#avatar")[0].files[0]);
+
+
+        $.ajax({
+            url: "/register/",
+            type: "post",
+            processData:false,
+            contentType:false,
+            data: form_data,
+            success: function (data) {   // {"user":"","error_meg":""}
+
+
+                if (data.user){   //   注册成功
+                    location.href="/login/"
+                }
+                else {            // 注册失败
+
+                 var errors_dict=data.error_mes;
+                 //     清空操作
+                 $("form span").html("");
+                 $(".form-group").removeClass("has-error");
+
+                 $.each(errors_dict,function (field,error_info) {
+                     console.log(field,error_info[0]);
+
+                     $("#id_"+field).next().html(error_info[0]).css("color","red");
+                     $("#id_"+field).parent().addClass("has-error");
+
+                 })
+
+
+
+                }
+
+
+
+            }
+        })
+
+    });
+
+    // 头像预览
+    $("#avatar").change(function () {
+        // 获取用户选中的文件
+        var choose_file=$("#avatar")[0].files[0];
+        // JS 的文件阅读器
+        var reader=new FileReader();
+        reader.readAsDataURL(choose_file);
+
+        reader.onload=function(){
+            $("#avatar_img").attr("src",this.result)
+        };
+    })
+
+
+</script>
+
+</body>
+</html>

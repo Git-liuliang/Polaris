@@ -1,0 +1,71 @@
+#!/bin/sh
+
+
+####检测包名是否是com.nictalk.start######
+flag=`grep 'com.nictalk.start' /root/.jenkins/workspace/$JOB_NAME/app/build.gradle | wc -l`
+
+if [ $flag -ne 1 ]
+then
+        echo "com.nictalk.start package name is modified ! quit !"
+        exit 1
+fi
+
+
+echo $JOB_NAME
+echo $Name
+
+
+cd /root/.jenkins/workspace/$JOB_NAME/
+grep "CooTalk" * -R | awk -F: '{print $1}' | sort | uniq | grep strings.xml$ | xargs sed -i 's/CooTalk/CamTalk/g'
+grep "NicTalk" * -R | awk -F: '{print $1}' | sort | uniq | grep strings.xml$ | xargs sed -i 's/NicTalk/CamTalk/g'
+
+#grep "CooTalk" * -R | awk -F: '{print $1}' | sort | uniq | grep xml$ | xargs sed -i 's/CooTalk/CamTalk/g'
+#grep "COOBILL_SERVICE" * -R | awk -F: '{print $1}' | sort | uniq |xargs sed -i 's/CooTalk/CamTalk/g'
+
+sed -i 's/jvmargs=-Xmx2048m/jvmargs=-Xmx4906m/g' /root/.jenkins/workspace/$JOB_NAME/gradle.properties
+
+sed -i 's/versionName "Nictalk/versionName "Camtalk/g' /root/.jenkins/workspace/$JOB_NAME/app/build.gradle
+sed -i 's/Nictalk/Camtalk/g' /root/.jenkins/workspace/scripts/ENV
+
+cd /root/.jenkins/workspace/$JOB_NAME/app/src/main/java/com/xinwei/cootalk/constant/
+sed -i "s/talkapp.cootel.com.ni/talkapp.cootel.com/g" RequestUrlConstant.java
+sed -i "s/coobill.cootel.com.ni/coobill.cootel.com.kh/g" RequestUrlConstant.java
+sed -i "s/138.117.4.59:8000/103.5.126.254:8000/g" RequestUrlConstant.java
+sed -i "s/talkbonus.cootel.com.ni/talkbonus.cootel.com/g" RequestUrlConstant.java
+sed -i "s/talkfile.cootel.com.ni/talkfile.cootel.com/g" RequestUrlConstant.java
+sed -i "s/talkim.cootel.com.ni/talkim.cootel.com/g" RequestUrlConstant.java
+sed -i "s/chatapp.cootel.com.ni/talkapp.cootel.com/g" RequestUrlConstant.java
+sed -i "s/nictalk.cootel.com.ni/camtalk.cootel.com/g" RequestUrlConstant.java
+sed -i "s/nictalk.cootel.com.ni/camtalk.cootel.com/g" ConstantValue.java
+
+cd /root/.jenkins/workspace/$JOB_NAME/VoIP-PJSIP/src/com/csipsimple/api/
+sed -i 's/public static final String KEY_SAG_SERVER =.*$/public static final String KEY_SAG_SERVER = "103.206.203.2:8000";/g' SipManager.java
+
+cd /root/.jenkins/workspace/$JOB_NAME/app/
+sed -i "s/com.nictalk.start/com.camtalk.start/g" build.gradle
+
+cd /root/.jenkins/workspace/$JOB_NAME/app/src/main/
+sed -i "s/0f9ef36e77cfd8cf151f59c313f2f485/11b7e4b54b41bbc0a03576113e6cbbc7/g" AndroidManifest.xml
+sed -i "s/AIzaSyDL02IE7uw-iw86hXsi2Bh1R6Og5DqnyDQ/AIzaSyBxuTiCzquF68brudcyrNX5c7GGxtHr6Zc/g" AndroidManifest.xml
+
+cd /root/.jenkins/workspace/$JOB_NAME/app/src/main/res/drawable-xxhdpi/
+rm -rf splash_bg.png
+cp /root/.jenkins/workspace/img/camtalk/splash_bg.png .
+
+cd /root/.jenkins/workspace/$JOB_NAME/app/src/main/res/
+grep ">+505<" * -R | awk -F: '{print $1}' | sort | uniq | grep strings.xml | xargs sed -i 's/>+505</>+855</g'
+grep "Nicaragua<" * -R | awk -F: '{print $1}' | sort | uniq | grep strings.xml |xargs sed -i 's/Nicaragua</Cambodia</g'
+grep "尼加拉瓜<" * -R | awk -F: '{print $1}' | sort | uniq | grep strings.xml |xargs sed -i 's/尼加拉瓜</柬埔寨</g'
+
+
+###分享用到的sdk，jar包替换
+
+cd  /root/.jenkins/workspace/$JOB_NAME/sharesdk/libs/
+rm -rf *
+cp /root/.jenkins/workspace/img/camtalk/jar/* .
+cd /root/.jenkins/workspace/$JOB_NAME/app/src/main/assets
+rm -rf ShareSDK.xml
+cp /root/.jenkins/workspace/img/camtalk/xml/ShareSDK.xml .
+
+
+

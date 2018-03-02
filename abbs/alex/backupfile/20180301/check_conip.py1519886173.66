@@ -1,0 +1,34 @@
+#!/usr/bin/python
+# coding:utf-8
+
+import sys
+import subprocess
+
+def print_dockerlist(containername):
+	docker_list = subprocess.Popen(["sudo docker ps |grep -v 'CONTAINER ID'|awk '{print  $NF}'"], stdout = subprocess.PIPE, shell = True).stdout.read()
+	up_number = subprocess.Popen(["sudo docker ps |grep -v 'CONTAINER ID'|wc -l"], stdout = subprocess.PIPE, shell = True).stdout.read()
+	dlist =  docker_list.split('\n')
+	unum = int(up_number)
+	uip = []
+	for i in range (0,unum):
+        	uip.append( subprocess.Popen(["sudo docker exec %s ip addr show eth1  | grep /24 | awk '{ print substr($2,1,11)}'" %dlist[i]], stdout = subprocess.PIPE, shell = True).stdout.read())
+        ip_list = []
+	for m in range (0,unum):
+        	ip_list.append( uip[m][:11])
+        dic = dict(zip(dlist, ip_list))
+	#print dic['aco01']
+        return dic[containername]
+
+
+if __name__ == '__main__':
+    from optparse import OptionParser
+    parser = OptionParser()
+#    parser.add_option("-p","--process",dest="process",default="httpd",
+#        help="process for name",metavar="process")
+    parser.add_option("-n","--name",dest="containername",default="aco01",
+        help="print containername",metavar="containername")
+    #parser.add_option("-c","--critical",dest="critical",default="12",
+    #    help="process count critical",metavar="critical")
+    (options,args) = parser.parse_args()
+    print_dockerlist(options.containername)
+

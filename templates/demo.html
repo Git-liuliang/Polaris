@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script>
+        var count = 0;
+        function show(){
+
+    document.getElementById("job_status").innerHTML = count + 1;
+    count =count +1;
+  }
+{#    $(window).load(function () {#}
+{#                setInterval(show, 1000);#}
+{#            });#}
+        function sss() {
+
+        $.ajax({
+            url: "/process/",
+            type: "post",
+            data: { "jobid":"{{ res }}"},
+            success: function (data) {
+                var data = JSON.parse(data);
+                document.getElementById("zhz").innerHTML = data.status;
+            }
+        })
+}
+
+ $(window).load(function () {
+                setInterval(sss, 10000);
+            });
+
+    </script>
+</head>
+<body>
+
+<div>任务id</div>
+<div id="resid">{{ res }}</div>
+<div>任务状态</div>
+<div id="job_status"></div>
+<div id="zhz"></div>
+
+
+<script>
+
+
+
+</script>
+</body>
+</html>

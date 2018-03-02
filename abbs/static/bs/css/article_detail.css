@@ -1,0 +1,35 @@
+.article_con{
+    font-size: 14px;
+    text-align: justify;
+    text-indent: 30px;
+    line-height: 23px;
+
+}
+
+
+
+.comment_img{
+    float: left;
+    margin-right: 20px;
+}
+
+.comment_text{
+    margin-top: 5px;
+}
+
+
+#id_comment_content span{
+    color:black;
+}
+
+
+
+.up_btn{
+    margin-right: 20px;
+    font-size: 14px;
+
+}
+
+.response_btn{
+    font-size: 14px;
+}
